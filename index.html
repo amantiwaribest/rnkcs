@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Time Table</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  background:#e8ecf1;
+  color:#1e293b;
+  display:flex;
+  justify-content:center;
+  padding:20px
+}
+#app{
+  width:98%;
+  max-width:1120px;
+  margin:16px auto;
+  background:#fff;
+  border-radius:0;
+  box-shadow:0 4px 24px rgba(0,0,0,.1);
+  border:2px solid #0D4BBC;
+  overflow:visible;
+  box-sizing:border-box
+}
+.toolbar{
+  background:linear-gradient(135deg,#0D4BBC,#0A3A8F);
+  color:#fff;
+  padding:14px 24px;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px
+}
+.toolbar h1{font-size:1.4rem;font-weight:700;letter-spacing:-.5px;flex:1;min-width:140px}
+.tabs{display:flex;gap:4px}
+.tab{
+  padding:6px 14px;
+  border:2px solid rgba(255,255,255,.3);
+  border-radius:8px;
+  background:transparent;
+  color:#fff;
+  font-size:.8rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+  white-space:nowrap
+}
+.tab:hover{background:rgba(255,255,255,.15)}
+.tab.active{background:#fff;color:#0D4BBC;border-color:#fff}
+.btn-group{display:flex;gap:6px}
+.school-header{position:relative;text-align:center;padding:20px 8px}
+.school-header .sh-logo{
+  position:absolute;left:25px;top:50%;transform:translateY(-50%);
+  width:110px;height:110px;background:transparent;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;
+  font-size:1.2rem;letter-spacing:-.5px
+}
+.school-header .sh-logo img{display:block;width:100%;height:100%;object-fit:contain;position:absolute;top:0;left:0}
+.school-header .sh-logo img~span{display:none}
+.school-header .sh-text{display:inline-flex;flex-direction:column;gap:1px}
+.school-header .sh-school{font-size:18pt;font-weight:800;color:#0D4BBC;letter-spacing:.3px;text-transform:uppercase}
+.school-header .sh-class{font-size:14pt;font-weight:600;color:#0D4BBC}
+.school-header .sh-title{font-size:16pt;font-weight:700;color:#0A3A8F}
+@media print{.school-header{padding:20px 8px;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.school-header .sh-school{font-size:18pt}.school-header .sh-class{font-size:14pt}.school-header .sh-title{font-size:16pt}}
+.print-btn,.regen-btn{
+  padding:6px 16px;
+  border:none;
+  border-radius:8px;
+  font-size:.8rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+  white-space:nowrap
+}
+.print-btn{background:#fff;color:#0D4BBC}
+.print-btn:hover{background:#E3EDFB;transform:scale(1.03)}
+.regen-btn{background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.3)}
+.regen-btn:hover{background:rgba(255,255,255,.3)}
+.controls{
+  padding:10px 24px;
+  background:#f1f5f9;
+  border-bottom:1px solid #e2e8f0;
+  display:flex;
+  align-items:center;gap:14px;flex-wrap:wrap
+}
+.controls label{font-weight:600;font-size:.85rem;color:#475569}
+.select-wrap{position:relative;width:230px}
+.select-field{display:flex;align-items:center;gap:10px}
+.select-label{font-size:12.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748b}
+.select-trigger{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;width:100%;padding:8px 14px;background:#fff;border:2px solid #cbd5e1;border-radius:10px;color:#0D4BBC;font-size:.95rem;font-weight:600;cursor:pointer;box-shadow:0 1px 3px rgba(13,75,188,.08);transition:border-color .15s ease,box-shadow .15s ease}
+.select-trigger:hover{border-color:#176BE5}
+.select-trigger:focus-visible,.select-trigger.active{border-color:#0D4BBC;box-shadow:0 0 0 3px #E3EDFB}
+.select-trigger .placeholder-dim{color:#94a3b8;font-weight:500}
+.caret{width:9px;height:9px;border-right:1.5px solid #64748b;border-bottom:1.5px solid #64748b;transform:rotate(45deg);margin-top:-4px;flex-shrink:0;transition:transform .2s ease}
+.select-trigger.active .caret{transform:rotate(225deg);margin-top:4px}
+.dropdown{position:absolute;top:calc(100% + 8px);left:0;width:100%;max-height:260px;overflow-y:auto;background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:6px;box-shadow:0 12px 30px -10px rgba(13,75,188,.25);opacity:0;visibility:hidden;transform:translateY(-6px);transform-origin:top;transition:opacity .15s ease,transform .15s ease,visibility .15s;z-index:20;list-style:none;margin:0}
+.select-wrap.open .dropdown{opacity:1;visibility:visible;transform:translateY(0)}
+.dropdown li{padding:0}
+.option{all:unset;box-sizing:border-box;display:block;width:100%;padding:7px 12px;border-radius:7px;font-size:14px;color:#1e293b;cursor:pointer;transition:background .12s ease}
+.option:hover,.option:focus-visible{background:#E3EDFB}
+.option.selected{color:#0D4BBC;font-weight:600;background:#E3EDFB}
+.dropdown::-webkit-scrollbar{width:6px}
+.dropdown::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:6px}
+.legend{margin-left:auto;display:flex;gap:12px;font-size:.75rem;color:#64748b}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+.dot.ct{background:#0D4BBC}
+.dot.free{background:#10b981}
+.dot.sub{background:#176BE5}
+.table-wrap{
+  padding:4px 0.1% 0;
+  overflow:visible
+}
+.table-wrap table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:1rem;
+  table-layout:auto
+}
+.table-wrap th:first-child,.table-wrap td:first-child{width:64px}
+.table-wrap th,.table-wrap td{
+  border:1px solid #e2e8f0;
+  padding:6px 6px;
+  text-align:center;
+  vertical-align:middle
+}
+.table-wrap thead th{
+  background:linear-gradient(135deg,#0D4BBC,#176BE5);
+  color:#fff;
+  font-weight:600;
+  font-size:1rem;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  padding:8px 4px;
+  position:sticky;top:0
+}
+.table-wrap thead th:first-child{background:linear-gradient(135deg,#082E72,#0D4BBC)}
+.table-wrap tbody td:first-child{
+  background:#f1f5f9;
+  font-weight:700;
+  font-size:1rem;
+  color:#475569;
+  width:68px
+}
+.table-wrap tbody tr:nth-child(even) td:not(:first-child){background:#fafbfc}
+.table-wrap tbody tr:hover td:not(:first-child){background:#EAF1FD}
+.cell-content{
+  outline:none;
+  min-height:50px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px
+}
+.cell-content .tname{font-weight:700;font-size:1rem;color:#1e293b;line-height:1.3}
+.cell-content .tsub{font-size:.9rem;color:#64748b;line-height:1.2}
+.cell-content .tct{font-size:.9rem;color:#0D4BBC;font-weight:600;background:#F4F8FE;padding:0 6px;border-radius:4px;line-height:1.4}
+.cell-content .tfree{font-size:.95rem;color:#059669;font-weight:700;padding:2px 12px;border-radius:6px}
+.cell-content .tsubstitute{font-size:.9rem;color:#0D4BBC;font-weight:700;padding:0 6px;border-radius:4px}
+.cell-content .tstudy{font-size:.9rem;color:#e11d48;font-weight:600;background:#fff1f2;padding:0 6px;border-radius:4px}
+.cell-content .tedit{font-size:.98rem;color:#1e293b;line-height:1.4;font-weight:500}
+.summary-wrap{padding:16px 24px}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.summary-card{border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;background:#fafbfc}
+.summary-card h3{font-size:1rem;color:#0D4BBC;margin-bottom:5px}
+.summary-card .stat{display:flex;justify-content:space-between;font-size:.9rem;padding:2px 0;border-bottom:1px solid #f1f5f9}
+.summary-card .stat:last-child{border:none}
+.summary-card .stat .val{font-weight:700;color:#1e293b}
+.week-nav{text-align:center;margin-bottom:8px;font-size:.75rem;color:#64748b}
+.week-nav strong{color:#0D4BBC}
+.print-only{display:none}
+ @media print{
+  @page{size:A4 landscape;margin:8mm}
+  body{padding:0;margin:0;background:#fff;display:block}
+  .print-only{display:block!important}
+  #app{width:98%;margin:0 auto;box-shadow:none;border:2px solid #0D4BBC;box-sizing:border-box;overflow:visible;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .toolbar{display:none!important}
+  .tab,.print-btn,.regen-btn,.controls{display:none!important}
+  .table-wrap{padding:4px 0.1% 0;overflow:visible}
+
+
+  .table-wrap thead th{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .table-wrap tbody td:first-child{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .table-wrap tbody tr:nth-child(even) td:not(:first-child){-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .cell-content .tct{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .cell-content .tfree{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .cell-content .tsubstitute{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .cell-content .tstudy{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .table-wrap table{font-size:1rem}
+  .cell-content .tname{font-size:1rem}
+  .cell-content .tsub{font-size:.9rem}
+  .week-nav{font-size:.68rem!important;display:block!important}
+  .overview-view > .school-header:first-child{display:none!important}
+  .overview-view .overview-day{border:2px solid #0D4BBC;margin-bottom:0;padding:4px;page-break-inside:avoid}
+  .overview-view#app{border:none;overflow:visible}
+  .distrib-view#app{border:none;overflow:visible}
+  .distrib-view > .school-header{display:none!important}
+  .distrib-view .distrib-wrap{max-height:none!important;overflow:visible!important}
+  .distrib-page{page-break-after:always;box-sizing:border-box;overflow:visible;padding:4px 6px;border:2px solid #0D4BBC}
+  .distrib-page:last-child{page-break-after:avoid}
+  .distrib-view .distrib-title{display:none!important}
+  .distrib-view .distrib-page .distrib-ph2{display:block!important}
+  .distrib-view .distrib-page .school-header{display:block!important}
+  .summary-view > .school-header{border-bottom:3px solid #0D4BBC;padding-bottom:25px;margin-bottom:6px}
+  .distrib-view .distrib-page .school-header{border-bottom:3px solid #0D4BBC;padding-bottom:25px;margin:0 -6px 6px}
+}
+@media(max-width:700px){
+  .toolbar h1{font-size:1rem}
+  .tab{padding:4px 10px;font-size:.72rem}
+  .table-wrap{padding:8px 6px}
+  .table-wrap table{font-size:.7rem}
+  .cell-content .tname{font-size:.7rem}
+  .cell-content .tsub{font-size:.7rem}
+}
+.distrib-wrap{padding:8px 16px;max-height:80vh;overflow-y:auto}
+@media screen{
+.distrib-view > .school-header{display:block}
+.distrib-view .distrib-page .school-header{display:none}
+.distrib-view .distrib-page h2{display:none}
+.distrib-view .distrib-title{display:block}
+.overview-view > .school-header{display:block}
+.overview-day .school-header{display:none}
+}
+.distrib-row-group{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-content:start}
+.distrib-page{margin-bottom:0}
+.distrib-class{break-inside:avoid}
+.distrib-class h3{font-size:.82rem;color:#0D4BBC;margin-bottom:4px;background:#EAF1FD;padding:4px 10px;border-radius:6px}
+.distrib-row{display:flex;align-items:center;gap:6px;margin:2px 0;font-size:.72rem}
+.distrib-label{width:80px;text-align:right;color:#475569;font-weight:600;flex-shrink:0;font-size:.68rem}
+.distrib-bar-wrap{flex:1;height:18px;background:#f1f5f9;border-radius:4px;overflow:hidden}
+.distrib-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;color:#fff;font-weight:700;font-size:.68rem;transition:width .3s;min-width:18px}
+.distrib-count{width:26px;text-align:center;font-weight:700;color:#1e293b;flex-shrink:0;font-size:.68rem}
+@media print{.distrib-row-group{display:flex!important;flex-wrap:wrap;gap:0}.distrib-row-group>.distrib-class{width:33.33%;flex:none;box-sizing:border-box;padding:0 12px;margin-bottom:24px}}
+.overview-wrap{padding:8px 1px 12px 1px;display:flex;flex-direction:column;gap:16px}
+.overview-day{page-break-after:always}
+.ov-day-bar{background:linear-gradient(135deg,#0D4BBC,#176BE5);color:#fff;padding:6px;font-size:.82rem;display:flex;justify-content:space-between;align-items:center}
+.ov-day-bar span{font-weight:400;font-size:.68rem;opacity:.85}
+.overview-day table{width:100%;border-collapse:collapse;font-size:.95rem;table-layout:auto}
+.overview-day th,.overview-day td{border:1px solid #d1d5db;padding:11px 6px;text-align:center;vertical-align:middle}
+.overview-day thead th{background:#EAF1FD;color:#0D4BBC;font-weight:700;font-size:.9rem;padding:10px 6px}
+.overview-day tbody td:first-child{background:#f1f5f9;font-weight:700;color:#1e293b;font-size:.9rem;width:36px}
+.overview-day tbody tr:nth-child(even) td:not(:first-child){background:#fafbfc}
+.overview-day .ov-tname{font-weight:600;color:#1e293b;font-size:.85rem}
+.overview-day .ov-tname.ni{color:#d97706}
+.overview-day .ov-sub{font-size:.82rem;color:#64748b}
+.overview-day td.sub-cell{background:#E3EDFB!important}
+.overview-day td.sub-cell .ov-sub{font-weight:700;color:#0D4BBC;font-size:.9rem}
+.overview-day .ov-free{color:#059669;font-weight:700;font-size:.85rem}
+@media print{.overview-wrap{gap:0;padding:8px 0 0 0}.overview-day{border:none;border-radius:0;page-break-after:always}.overview-day:last-child{page-break-after:auto}.ov-day-bar{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;font-size:10pt;padding:4px 12px}.overview-day table{font-size:10pt}.overview-day th,.overview-day td{padding:5px 5px}.overview-day thead th{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.overview-day tbody td:first-child{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
+td.free-cell{background:#d1fae5!important}
+td.sub-cell{background:#E3EDFB!important}
+@media print{td.free-cell{background:#d1fae5!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}td.sub-cell{background:#E3EDFB!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
+@media screen{
+  body{background:linear-gradient(135deg,#F4F8FE 0%,#EAF1FD 100%)}
+  #app{border-radius:20px;box-shadow:0 14px 44px rgba(13,75,188,.18);border-color:#176BE5;padding:0 10px 12px}
+  .table-wrap,.summary-wrap,.distrib-wrap,.overview-wrap{border-radius:0 0 20px 20px}
+  .toolbar{box-shadow:0 3px 14px rgba(13,75,188,.28);border-bottom:2px solid #0A3A8F}
+  .school-header .sh-logo{left:25px;width:110px;height:110px}
+  .school-header .sh-school{text-shadow:0 1px 0 rgba(13,75,188,.08)}
+  .tab:hover{box-shadow:0 2px 8px rgba(13,75,188,.25)}
+  .tab.active{box-shadow:0 3px 10px rgba(13,75,188,.3);transform:translateY(-1px)}
+  .print-btn,.regen-btn{box-shadow:0 2px 6px rgba(13,75,188,.25);transition:.2s}
+  .print-btn:hover,.regen-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,75,188,.35)}
+  .table-wrap thead th{background:linear-gradient(135deg,#0D4BBC 0%,#1253C8 50%,#176BE5 100%);box-shadow:0 2px 6px rgba(13,75,188,.2)}
+  .table-wrap thead th:first-child{background:linear-gradient(135deg,#082E72 0%,#0D4BBC 100%)}
+  .table-wrap tbody td:first-child{background:linear-gradient(135deg,#F4F8FE,#E3EDFB)}
+  .table-wrap tbody tr:nth-child(even) td:not(:first-child){background:#F4F8FE}
+  .summary-card{border-color:#D6E2FB;box-shadow:0 3px 12px rgba(13,75,188,.07);transition:.2s}
+  .summary-card:hover{box-shadow:0 6px 18px rgba(13,75,188,.12);transform:translateY(-2px)}
+  .summary-card h3{border-bottom:2px solid #D6E2FB;padding-bottom:5px}
+  .distrib-class h3{box-shadow:0 2px 6px rgba(13,75,188,.15);border:1px solid #D6E2FB}
+  .ov-day-bar{box-shadow:0 2px 8px rgba(13,75,188,.22);background:linear-gradient(135deg,#0D4BBC 0%,#1253C8 50%,#176BE5 100%)}
+  .overview-day{border:2px solid #176BE5;border-radius:10px;overflow:hidden;box-shadow:0 3px 14px rgba(13,75,188,.08)}
+}
+.print-all-chk{display:flex;align-items:center;gap:6px;font-size:.82rem;color:#475569;cursor:pointer;user-select:none}
+.print-all-chk input{width:16px;height:16px;accent-color:#0D4BBC;cursor:pointer}
+#print-all{display:none}
+.print-page{border:2px solid #0D4BBC;box-sizing:border-box;page-break-after:always}
+.print-page:last-child{page-break-after:auto}
+@media print{
+  body.print-all-mode #app{display:none!important}
+  body.print-all-mode #print-all{display:block!important}
+  .print-page{width:98%;margin:0 auto;padding:4px 6px}
+  .print-page .school-header{min-height:120px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="school-header">
+    <div class="sh-logo"><img src="https://i.postimg.cc/JzpCchY4/RNK-Adarsh-Convent-School.png" alt="R.N.K Adarsh Convent School"><span>RNK</span></div>
+    <div class="sh-text">
+      <div class="sh-school">R.N.K ADARSH CONVENT SCHOOL</div>
+      <div class="sh-class">Class 1st to 10th</div>
+      <div class="sh-title">Academic Time Table 2026</div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <div class="tabs">
+      <button class="tab active" data-view="class">Class</button>
+      <button class="tab" data-view="teacher">Teacher</button>
+      <button class="tab" data-view="summary">Load</button>
+      <button class="tab" data-view="distrib">Distrib</button>
+      <button class="tab" data-view="overview">Master</button>
+    </div>
+    <div class="btn-group">
+      <button class="print-btn" onclick="doPrint()">Print</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div id="class-selector">
+      <div class="select-field">
+        <span class="select-label">Class</span>
+        <div class="select-wrap" id="classWrap">
+          <button class="select-trigger" id="classTrigger" aria-haspopup="listbox" aria-expanded="false">
+            <span id="classTriggerText" class="placeholder-dim">Choose class</span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown" role="listbox" id="classDropdown"></ul>
+        </div>
+      </div>
+    </div>
+    <div id="teacher-selector" style="display:none">
+      <div class="select-field">
+        <span class="select-label">Teacher</span>
+        <div class="select-wrap" id="teacherWrap">
+          <button class="select-trigger" id="teacherTrigger" aria-haspopup="listbox" aria-expanded="false">
+            <span id="teacherTriggerText" class="placeholder-dim">Choose teacher</span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown" role="listbox" id="teacherDropdown"></ul>
+        </div>
+      </div>
+    </div>
+      <label class="print-all-chk" id="allprint-wrap"><input type="checkbox" id="allprint"> Print all</label>
+      <div class="legend" id="legend">
+      <span><span class="dot free"></span> Free</span>
+      <span><span class="dot sub"></span> Sub</span>
+    </div>
+  </div>
+
+  <div id="timetable-container" class="table-wrap"></div>
+  <div id="summary-container" class="summary-wrap" style="display:none"></div>
+  <div id="distrib-container" class="distrib-wrap" style="display:none"></div>
+  <div id="overview-container" class="overview-wrap" style="display:none"></div>
+</div>
+
+<div id="print-all"></div>
+
+<script>
+// ===================== DATA =====================
+const LOGO_IMG='<img src="https://i.postimg.cc/JzpCchY4/RNK-Adarsh-Convent-School.png" alt="R.N.K Adarsh Convent School">';
+const CLASSES = ['1A','1B','2','3','4','5','6','7','8','9','10'];
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const P_LABEL = ['Period 1','Period 2','Period 3','Period 4','Period 5','Period 6','Period 7','Period 8'];
+const P_DAY = [8,8,8,8,8,6]; // periods per day (Sat=6)
+const CUM = [0,7,14,21,28,35]; // cumulative subject periods before each day
+
+const TD = [
+  { id:'sangeeta', name:'Sangeeta Ma\'am', subs:[{n:'GK & Art',g:[1,2,3,4,5,6,7,8]},{n:'Conv. English',g:[1,2,3,4,5]}], ct:'1A' },
+  { id:'mahima', name:'Mahima Ma\'am', subs:[{n:'Computer',g:[1,2,3,4,5,6,7,8]},{n:'Hindi',g:[1,2,3,4]},{n:'Science',g:[1,2]}], ct:'3' },
+  { id:'suman', name:'Suman Ma\'am', subs:[{n:'Maths',g:[1,2,3,4]},{n:'SST',g:[1,2,3,4]},{n:'English',g:[1,2,3,4]},{n:'Conv. English',g:[1,2,3,4]}], ct:'2' },
+  { id:'rinki', name:'Rinki Ma\'am', subs:[{n:'Hindi',g:[1,2,3,4]},{n:'Sanskrit',g:[1,2,3,4,5,6,7,8]}], ct:'4' },
+  { id:'mansi', name:'Mansi Ma\'am', subs:[{n:'English',g:[1,2,3,4,5,6]},{n:'Conv. English',g:[1,2,3,4,5,6]}], ct:'5' },
+  { id:'pooja', name:'Pooja Ma\'am', subs:[{n:'SST',g:[1,2,3,4,5,6,7,8]},{n:'Science',g:[1,2,3]}], ct:'1B' },
+  { id:'jyotsana', name:'Jyotsana Ma\'am', subs:[{n:'Hindi',g:[5,6,7,8,9,10]},{n:'Sanskrit',g:[5,6,7,8]},{n:'GK & Art',g:[7,8,9,10]}], ct:'7' },
+  { id:'abhishek', name:'Abhishek Sir', subs:[{n:'Science',g:[3,4,5,6,7,8]},{n:'Maths',g:[3,4,5,6,7,8]},{n:'GK & Art',g:[5,6,7,8]}], ct:'8' },
+  { id:'sonam', name:'Sonam Ma\'am', subs:[{n:'Science',g:[9,10]},{n:'English',g:[9,10]},{n:'Computer',g:[5,6,7,8]},{n:'Conv. English',g:[7,8]}], ct:'9' },
+  { id:'chandan', name:'Chandan Sir', subs:[{n:'Maths',g:[7,8,9,10]},{n:'Computer',g:[5,6,7,8,9,10]}], ct:'10' },
+  { id:'ghanshyam', name:'Ghanshyam Sir', subs:[{n:'Science',g:[6,7,8,9,10]},{n:'English',g:[6,7,8,9,10]},{n:'Maths',g:[6,7,8,9,10]},{n:'GK & Art',g:[6,7,8]},{n:'SST',g:[5,6,7,8,9,10]}], ct:'6' }
+];
+const SUB = { id:'nisha', name:'Nisha Ma\'am', subs:[{n:'Substitute',g:[1,2,3,4,5,6,7,8,9,10]}] };
+const ALL_T = [...TD, SUB];
+const REG_IDS = TD.map(t=>t.id);
+const SUBJ_PRIORITY = {'Maths':9,'Science':8,'English':7,'Hindi':6,'Computer':5,'SST':4,'Sanskrit':3,'GK & Art':2,'Conv. English':1};
+const ALL_SUBJECTS = Object.keys(SUBJ_PRIORITY);
+
+function gd(c){ return parseInt(c); }
+const SUBJ_CAP={
+  // Classes 1-8: Maths=6 (extra), all other subjects=5
+  'Maths':{'1A':6,'1B':6,'2':6,'3':6,'4':6,'5':6,'6':6,'7':6,'8':6,'9':8,'10':8},
+  // Classes 9-10: 6 subjects, 4 get +1
+  'English':{'9':8,'10':8},
+  'Science':{'9':8,'10':8},
+  'Computer':{'5':5,'6':5,'7':5,'8':5,'9':8,'10':8},
+  'Sanskrit':{'9':0,'10':0},
+  'Hindi':{'9':7,'10':7},
+  'SST':{'9':7,'10':7},
+  'GK & Art':{'9':0,'10':0},
+  'Conv. English':{'9':0,'10':0}
+};
+function capFor(cls,sub){
+  if(sub==='Substitute') return 0;
+  const o=SUBJ_CAP[sub];if(o&&o[cls]!==undefined) return o[cls];
+  const g=gd(cls);
+  if(g<=8) return 5;
+  if(g<=10) return 6;
+return 0;
+}
+function getSubs(tId, cls){
+  const g=gd(cls);
+  const t=ALL_T.find(x=>x.id===tId);
+  if(!t) return [];
+  return t.subs.filter(s=>s.g.includes(g)).map(s=>s.n);
+}
+function canT(tId, cls){
+  const g=gd(cls);
+  const t=ALL_T.find(x=>x.id===tId);
+  if(!t) return false;
+  return t.subs.some(s=>s.g.includes(g));
+}
+function shf(a){return a;}
+
+// ===================== SUBJECT QUOTAS =====================
+// Even per-(teacher, cls, sub) distribution. Each teacher gets target load.
+// Solve via bipartite matching with iterative rebalancing.
+// target_t: 42 for first 7 TD, 43 for last 4 TD, 40 for Nisha
+function teacherTarget(t){
+  if(t.id==='nisha') return 40;
+  const idx=TD.findIndex(x=>x.id===t.id);
+  return idx<7?42:43;
+}
+function computeQuotas(){
+  // Target-first allocation: never exceed teacher's target.
+  // For each (cls, sub) in priority order, allocate cap to available teachers
+  // who are below target. Unfilled cap goes to Nisha.
+  // Then try to fill remaining teacher capacity from Nisha's slots.
+  const classSubKeys=[];
+  for(const cls of CLASSES){
+    for(const sub of ALL_SUBJECTS){
+      if(capFor(cls,sub)>0) classSubKeys.push({cls,sub});
+    }
+  }
+  classSubKeys.sort((a,b)=> (SUBJ_PRIORITY[b.sub]||0) - (SUBJ_PRIORITY[a.sub]||0));
+
+  const x={};ALL_T.forEach(t=>{x[t.id]={};classSubKeys.forEach(({cls})=>{x[t.id][cls]=x[t.id][cls]||{};});});
+  const tload={};ALL_T.forEach(t=>tload[t.id]=0);
+
+  // Step 1: Fill each (cls, sub) cap with available teachers BELOW target
+  for(const {cls,sub} of classSubKeys){
+    const cap=capFor(cls,sub);
+    if(cap===0) continue;
+    const avail=TD.filter(t=>getSubs(t.id,cls).includes(sub));
+    if(avail.length===0){
+      x['nisha'][cls]=x['nisha'][cls]||{};
+      x['nisha'][cls][sub]=cap;
+      tload['nisha']+=cap;
+      continue;
+    }
+    // Sort available teachers by current load (lowest first)
+    const sorted=[...avail].sort((a,b)=>tload[a.id]-tload[b.id]||a.id.localeCompare(b.id));
+    let remaining=cap;
+    for(const t of sorted){
+      if(remaining<=0) break;
+      const target=teacherTarget(t);
+      const room=Math.max(0, target-tload[t.id]);
+      const take=Math.min(remaining, room);
+      if(take>0){
+        x[t.id][cls][sub]=take;
+        tload[t.id]+=take;
+        remaining-=take;
+      }
+    }
+    if(remaining>0){
+      x['nisha'][cls]=x['nisha'][cls]||{};
+      x['nisha'][cls][sub]=remaining;
+      tload['nisha']+=remaining;
+    }
+  }
+
+  // Step 2b: Rebalance between TD teachers - transfer from those above fair-share to under
+  for(let iter=0;iter<200;iter++){
+    const under=TD.filter(t=>t.id!=='nisha'&&tload[t.id]<teacherTarget(t));
+    if(under.length===0) break;
+    let anyTransfer=false;
+    // For each under teacher, find a (cls,sub) they can teach where another TD has >fair-share
+    for(const tund of under){
+      if(tload[tund.id]>=teacherTarget(tund)) continue;
+      for(const cls of CLASSES){
+        for(const s of tund.subs.filter(s=>s.g.includes(gd(cls))).map(s=>s.n)){
+          const cap=capFor(cls,s);
+          if(cap===0) continue;
+          // Current total for this (cls,sub)
+          let total=0;for(const t of TD){total+=x[t.id][cls][s]||0;}
+          if(total>=cap) continue; // no room
+          // Find a TD teacher with >fair-share for this (cls,sub) who can give 1
+          const avail=TD.filter(t=>getSubs(t.id,cls).includes(s));
+          const fair=Math.floor(cap/avail.length);
+          for(const tgive of avail){
+            if(tgive.id===tund.id||tgive.id==='nisha') continue;
+            const giveCnt=x[tgive.id][cls][s]||0;
+            if(giveCnt>fair && tload[tgive.id]>=teacherTarget(tgive)){
+              // Transfer
+              x[tgive.id][cls][s]--;
+              tload[tgive.id]--;
+              x[tund.id][cls][s]=(x[tund.id][cls][s]||0)+1;
+              tload[tund.id]++;
+              anyTransfer=true;
+              break;
+            }
+          }
+          if(anyTransfer) break;
+        }
+        if(anyTransfer) break;
+      }
+    }
+    if(!anyTransfer) break;
+  }
+
+  // Step 2c: For remaining under teachers, take from Nisha
+  for(let iter=0;iter<50;iter++){
+    let anyChange=false;
+    for(const t of TD){
+      if(t.id==='nisha') continue;
+      const target=teacherTarget(t);
+      if(tload[t.id]>=target) continue;
+      for(const cls of CLASSES){
+        for(const s of t.subs.filter(s=>s.g.includes(gd(cls))).map(s=>s.n)){
+          const cap=capFor(cls,s);
+          if(cap===0) continue;
+          let total=0;for(const t2 of TD){total+=x[t2.id][cls][s]||0;}
+          total+=x['nisha'][cls]?x['nisha'][cls][s]||0:0;
+          if(total>=cap) continue;
+          const nishaHas=x['nisha'][cls]?x['nisha'][cls][s]||0:0;
+          if(nishaHas>0){
+            const take=Math.min(nishaHas, target-tload[t.id]);
+            if(take>0){
+              x['nisha'][cls][s]-=take;
+              tload['nisha']-=take;
+              x[t.id][cls][s]=(x[t.id][cls][s]||0)+take;
+              tload[t.id]+=take;
+              anyChange=true;
+              break;
+            }
+          }
+        }
+        if(anyChange) break;
+      }
+    }
+    if(!anyChange) break;
+  }
+
+  // Step 3: Build final q
+  const q={};
+  for(const cls of CLASSES){
+    q[cls]={};
+    for(const sub of ALL_SUBJECTS){q[cls][sub]=0;}
+    for(const sub of ALL_SUBJECTS){
+      if(capFor(cls,sub)===0) continue;
+      let total=0;
+      for(const t of ALL_T){
+        if(x[t.id][cls][sub]) total+=x[t.id][cls][sub];
+      }
+      if(total>0) q[cls][sub]=total;
+    }
+    let sum=0;for(const sub of Object.keys(q[cls])) sum+=q[cls][sub];
+    if(sum<46) q[cls]['Substitute']=46-sum;
+  }
+  q._tq=x;
+  return q;
+}
+
+// ===================== SCHEDULE GENERATION =====================
+
+function genSch(){
+  const sc={};
+  for(let d=0;d<6;d++){sc[d]={};for(let p=0;p<P_DAY[d];p++)sc[d][p]={};}
+  const ld={};ALL_T.forEach(t=>ld[t.id]=0);
+  const quotas=computeQuotas();
+  const x=quotas._tq;
+  // consumed[cls][sub] tracks actual periods assigned
+  const consumed={};
+  for(const cls of CLASSES){consumed[cls]={};for(const sub of Object.keys(quotas[cls]))consumed[cls][sub]=0;}
+
+  // remaining[tid][cls][sub] = how many periods teacher still needs to teach
+  const rem={};
+  ALL_T.forEach(t=>{rem[t.id]={};for(const cls of CLASSES){rem[t.id][cls]={};for(const sub of ALL_SUBJECTS)rem[t.id][cls][sub]=0;}});
+  for(const t of ALL_T)for(const cls of CLASSES)for(const sub of ALL_SUBJECTS)rem[t.id][cls][sub]=x[t.id][cls][sub]||0;
+
+  const target={};
+  for(const t of TD)target[t.id]=teacherTarget(t);
+  target['nisha']=40;
+
+  // Compute CT subject per class (blocked from non-P1)
+  const ctSub={};
+  for(const c of CLASSES){
+    const ct=TD.find(t=>t.ct===c);
+    if(ct){
+      const g=gd(c);
+      for(const s of ct.subs){
+        if(s.g.includes(g)){ctSub[c]=s.n;break;}
+      }
+    }
+  }
+
+  // Assignment order: subjects with highest remaining quota first (subject priority tiebreak)
+  // For each class, track subject run to avoid 3+
+  const clsRunAll={};
+
+  // ---- Phase 1: P1 = CT subject (guaranteed per-day) ----
+  for(let d=0;d<6;d++){
+    clsRunAll[d]={};
+    for(const c of CLASSES){
+      const ct=TD.find(t=>t.ct===c);
+      if(ct){
+        const sub=ctSub[c];
+        sc[d][0][c]={tid:ct.id,sub};
+        ld[ct.id]++;
+        consumed[c][sub]=(consumed[c][sub]||0)+1;
+        rem[ct.id][c][sub]=Math.max(0,(rem[ct.id][c][sub]||0)-1);
+        clsRunAll[d][c]={sub,count:1};
+      } else {
+        clsRunAll[d][c]={sub:null,count:0};
+      }
+    }
+  }
+
+  // ---- Phase 2: Fill remaining periods greedily ----
+  // For each (d,p,cls), pick any available teacher-subject with remaining need.
+  // Prefer: rem > 0, then highest need, then lowest load.
+  for(let d=0;d<6;d++){
+    for(let p=1;p<P_DAY[d];p++){
+      const freeIdx=(CUM[d]+p-1)%11;
+      const freeId=TD[freeIdx].id;
+      sc[d][p]._free=freeId;
+      const usedHere=new Set(['nisha']);
+      const order=[...CLASSES].sort((a,b)=>{
+        let ra=0,rb=0;
+        for(const s of ALL_SUBJECTS){ra+=quotas[a][s]-consumed[a][s];rb+=quotas[b][s]-consumed[b][s];}
+        return rb-ra;
+      });
+      for(const cls of order){
+        const ctS=ctSub[cls]||'';
+        let chosen=null;
+        const candidates=[];
+        for(const t of TD){
+          if(t.id===freeId||usedHere.has(t.id)) continue;
+          if(ld[t.id]>=target[t.id]) continue;
+          const subs=getSubs(t.id,cls);
+          for(const s of subs){
+            if(s===ctS) continue;
+            if((consumed[cls][s]||0)>=capFor(cls,s)) continue;
+            const need=quotas[cls][s]-(consumed[cls][s]||0);
+            if(need<=0) continue;
+            const nr=clsRunAll[d][cls].sub===s?clsRunAll[d][cls].count+1:1;
+            if(nr>3) continue;
+            const hasRem=(rem[t.id][cls][s]||0)>0;
+            candidates.push({tid:t.id,sub:s,load:ld[t.id],need,hasRem});
+            break;
+          }
+        }
+        // Sort: hasRem first, then highest need, then lowest load
+        candidates.sort((a,b)=>{
+          if(a.hasRem && !b.hasRem) return -1;
+          if(!a.hasRem && b.hasRem) return 1;
+          if(b.need!==a.need) return b.need-a.need;
+          return a.load-b.load;
+        });
+        if(candidates.length>0) chosen=candidates[0];
+        if(!chosen){
+          // Fallback: anyone with room, any subject with cap room
+          for(const t of TD){
+            if(t.id===freeId||usedHere.has(t.id)) continue;
+            if(ld[t.id]>=target[t.id]) continue;
+            const subs=getSubs(t.id,cls);
+            for(const s of subs){
+              if(s===ctS) continue;
+              if((consumed[cls][s]||0)>=capFor(cls,s)) continue;
+              const nr=clsRunAll[d][cls].sub===s?clsRunAll[d][cls].count+1:1;
+              if(nr>3) continue;
+              candidates.push({tid:t.id,sub:s,load:ld[t.id],need:0,hasRem:false});
+              break;
+            }
+          }
+          candidates.sort((a,b)=>a.load-b.load);
+          if(candidates.length>0) chosen=candidates[0];
+        }
+        if(!chosen) chosen={tid:'nisha',sub:'Substitute'};
+        sc[d][p][cls]={tid:chosen.tid,sub:chosen.sub};
+        ld[chosen.tid]++;
+        if(chosen.tid!=='nisha' && chosen.sub!=='Substitute'){
+          consumed[cls][chosen.sub]=(consumed[cls][chosen.sub]||0)+1;
+          rem[chosen.tid][cls][chosen.sub]=Math.max(0,(rem[chosen.tid][cls][chosen.sub]||0)-1);
+        }
+        usedHere.add(chosen.tid);
+        if(sc[d][p][cls].sub===clsRunAll[d][cls].sub) clsRunAll[d][cls].count++;
+        else clsRunAll[d][cls]={sub:sc[d][p][cls].sub,count:1};
+      }
+    }
+  }
+
+  // ---- Phase 3: Post-processing (same fix-ups as before) ----
+  // 3a: Fill remaining Nisha slots with underloaded teachers having rem > 0
+  for(let d=0;d<6;d++){
+    for(let p=1;p<P_DAY[d];p++){
+      const freeId=sc[d][p]._free;
+      for(const cls of CLASSES){
+        const cell=sc[d][p][cls];
+        if(!cell||cell.tid!=='nisha') continue;
+        const usedN=new Set();
+        for(const c of CLASSES){const oc=sc[d][p][c];if(oc&&oc.tid!=='nisha')usedN.add(oc.tid);}
+        let best=null,bestRoom=-1;
+        for(const t of TD){
+          if(t.id==='nisha'||t.id===freeId||usedN.has(t.id)||ld[t.id]>=target[t.id]) continue;
+          const subs=getSubs(t.id,cls);
+          for(const s of subs){
+            if(s===ctSub[cls]) continue;
+            if(rem[t.id][cls][s]<=0) continue;
+            if(consumed[cls][s]>=capFor(cls,s)) continue;
+            const room=target[t.id]-ld[t.id];
+            if(room>bestRoom){bestRoom=room;best={tid:t.id,sub:s};}
+            break;
+          }
+        }
+        if(best){
+          sc[d][p][cls]={tid:best.tid,sub:best.sub};
+          ld[best.tid]++;ld['nisha']--;
+          consumed[cls][best.sub]=(consumed[cls][best.sub]||0)+1;
+          rem[best.tid][cls][best.sub]=Math.max(0,(rem[best.tid][cls][best.sub]||0)-1);
+        }
+      }
+    }
+  }
+
+  // 3b: Swap Nisha out — replace with teacher who has rem for that class
+  for(let iter=0;iter<5;iter++){
+    let anySwap=false;
+    for(let d=0;d<6;d++){
+      for(let p=1;p<P_DAY[d];p++){
+        const freeId=sc[d][p]._free;
+        for(const clsN of CLASSES){
+          if(!sc[d][p][clsN]||sc[d][p][clsN].tid!=='nisha') continue;
+          for(const clsT of CLASSES){
+            if(clsT===clsN) continue;
+            const cT=sc[d][p][clsT];
+            if(!cT||cT.tid==='nisha'||cT.tid===freeId) continue;
+            const tId=cT.tid;
+            // Can tId teach clsN something from rem?
+            const subsN=getSubs(tId,clsN);
+            if(subsN.length===0) continue;
+            let foundSubN=null;
+            for(const s of subsN){
+              if(s===ctSub[clsN]) continue;
+              if((rem[tId][clsN][s]||0)<=0 && (quotas[clsN][s]-(consumed[clsN][s]||0))<=0) continue;
+              if(consumed[clsN][s]>=capFor(clsN,s)) continue;
+              foundSubN=s;break;
+            }
+            if(!foundSubN) continue;
+            // Find replacement for clsT
+            for(const rep of TD){
+              if(rep.id===tId||rep.id===freeId||rep.id==='nisha') continue;
+              let used=false;
+              for(const c of CLASSES){if(sc[d][p][c]?.tid===rep.id){used=true;break;}}
+              if(used) continue;
+              const repSubs=getSubs(rep.id,clsT);
+              if(repSubs.length===0) continue;
+              let foundRepSub=null;
+              for(const s of repSubs){
+                if(s===ctSub[clsT]) continue;
+                if((rem[rep.id][clsT][s]||0)<=0 && (quotas[clsT][s]-(consumed[clsT][s]||0))<=0) continue;
+                if(consumed[clsT][s]>=capFor(clsT,s)) continue;
+                foundRepSub=s;break;
+              }
+              if(!foundRepSub) continue;
+              sc[d][p][clsN]={tid:tId,sub:foundSubN};
+              sc[d][p][clsT]={tid:rep.id,sub:foundRepSub};
+              ld['nisha']--;ld[rep.id]++;
+              consumed[clsN][foundSubN]=(consumed[clsN][foundSubN]||0)+1;
+              consumed[clsT][cT.sub]=(consumed[clsT][cT.sub]||1)-1;
+              consumed[clsT][foundRepSub]=(consumed[clsT][foundRepSub]||0)+1;
+              if(cT.sub!=='Substitute') rem[tId][clsT][cT.sub]=Math.max(0,(rem[tId][clsT][cT.sub]||0)+1);
+              rem[tId][clsN][foundSubN]=Math.max(0,(rem[tId][clsN][foundSubN]||0)-1);
+              rem[rep.id][clsT][foundRepSub]=Math.max(0,(rem[rep.id][clsT][foundRepSub]||0)-1);
+              anySwap=true;
+              break;
+            }
+            if(sc[d][p][clsN].tid!=='nisha') break;
+          }
+        }
+      }
+    }
+    if(!anySwap) break;
+  }
+
+  // 3c: Redistribute class-10 Substitute evenly across days
+  for(let iter=0;iter<10;iter++){
+    let moved=false;
+    const subs=[];
+    for(let d=0;d<6;d++)for(let p=0;p<P_DAY[d];p++)if(sc[d][p]['10']?.tid==='nisha')subs.push([d,p]);
+    if(subs.length===0)break;
+    const perDay=Array(6).fill(0);for(const[d]of subs)perDay[d]++;
+    const cnt=subs.length,tgt=Math.floor(cnt/6),rem2=cnt%6;
+    const dailyTgt=Array.from({length:6},(_,i)=>tgt+(i<rem2?1:0));
+    for(let si=0;si<subs.length;si++){
+      const[d,p]=subs[si];
+      const prevSub=p>0&&sc[d][p-1]['10']?.tid==='nisha';
+      const overTgt=perDay[d]>dailyTgt[d];
+      if(!prevSub&&!overTgt)continue;
+      for(let d2=0;d2<6;d2++){
+        if(d2===d||perDay[d2]+1>dailyTgt[d2])continue;
+        for(let p2=0;p2<P_DAY[d2];p2++){
+          const cell=sc[d2][p2]['10'];
+          if(!cell||cell.tid==='nisha')continue;
+          if(p2===0)continue;
+          if(p2>0&&sc[d2][p2-1]['10']?.tid==='nisha')continue;
+          if(p2<P_DAY[d2]-1&&sc[d2][p2+1]['10']?.tid==='nisha')continue;
+          const tId=cell.tid;
+          let avail=true;
+          for(const c of CLASSES){const cc=sc[d][p][c];if(cc&&cc.tid===tId){avail=false;break;}}
+          if(!avail)continue;
+          sc[d][p]['10']={tid:tId,sub:cell.sub};
+          sc[d2][p2]['10']={tid:'nisha',sub:'Substitute'};
+          perDay[d]--;perDay[d2]++;moved=true;break;
+        }
+        if(moved)break;
+      }
+    }
+    if(!moved)break;
+  }
+
+  // 3d: Force-assign missing subject quotas (e.g., Hindi in class 9)
+  for(const cls of CLASSES){
+    for(const sub of Object.keys(quotas[cls])){
+      if(sub==='Substitute'||sub===ctSub[cls]||(consumed[cls][sub]||0)>=quotas[cls][sub]) continue;
+      for(let d=0;d<6;d++){
+        for(let p=1;p<P_DAY[d];p++){
+          if(sc[d][p][cls]?.tid!=='nisha') continue;
+          const freeId=sc[d][p]._free;
+          for(const t of TD.filter(x=>getSubs(x.id,cls).includes(sub))){
+            if(t.id===freeId||ld[t.id]>=target[t.id]) continue;
+            let used=false;
+            for(const c of CLASSES){if(sc[d][p][c]?.tid===t.id){used=true;break;}}
+            if(used) continue;
+            sc[d][p][cls]={tid:t.id,sub:sub};
+            ld[t.id]++;ld['nisha']--;
+            consumed[cls][sub]=(consumed[cls][sub]||0)+1;
+            if(sub!=='Substitute') rem[t.id][cls][sub]=Math.max(0,(rem[t.id][cls][sub]||0)-1);
+            d=6;break;
+          }
+          if((consumed[cls][sub]||0)>=quotas[cls][sub]) break;
+        }
+      }
+    }
+  }
+
+  // 3e: Force SST in classes 9-10
+  for(const cls of['9','10']){
+    let sstCount=0;
+    for(let d=0;d<6;d++)for(let p=0;p<P_DAY[d];p++)if(sc[d][p][cls]?.sub==='SST')sstCount++;
+    while(sstCount<3){
+      let done=false;
+      for(let d=0;d<6&&!done;d++)for(let p=0;p<P_DAY[d]&&!done;p++){
+        const cell=sc[d][p][cls];
+        if(cell&&cell.tid==='ghanshyam'&&cell.sub!=='SST'&&getSubs('ghanshyam',cls).includes('SST')){
+          const oldSub=cell.sub;
+          cell.sub='SST';
+          consumed[cls]['SST']=(consumed[cls]['SST']||0)+1;
+          consumed[cls][oldSub]--;
+          sstCount++;done=true;
+        }
+      }
+      if(!done) break;
+    }
+  }
+
+  // 3f: Break 4+ consecutive Substitute runs
+  for(let d=0;d<6;d++){
+    for(const cls of CLASSES){
+      for(let p=0;p<P_DAY[d];p++){
+        let run=1;
+        for(let k=p+1;k<P_DAY[d]&&sc[d][k][cls]?.sub==='Substitute'&&sc[d][p]?.sub==='Substitute';k++)run++;
+        if(run>=4&&sc[d][p]?.sub==='Substitute'){
+          const freeId=sc[d][p]._free;
+          for(let k=p;k<p+run;k++){
+            for(const t of TD){
+            if(t.id==='nisha'||t.id===freeId||ld[t.id]>=target[t.id]) continue;
+              let used=false;
+              for(const c of CLASSES){if(sc[d][k][c]?.tid===t.id){used=true;break;}}
+              if(used) continue;
+              const subs=getSubs(t.id,cls);
+              if(subs.length>0&&subs[0]!==ctSub[cls]&&(consumed[cls][subs[0]]||0)<(gd(cls)<=4?9:gd(cls)<=8?10:14)){
+                sc[d][k][cls]={tid:t.id,sub:subs[0]};
+                ld[t.id]++;ld['nisha']--;
+                consumed[cls][subs[0]]=(consumed[cls][subs[0]]||0)+1;
+                p=k;break;
+              }
+            }
+            if(sc[d][k][cls]?.tid!=='nisha') break;
+          }
+          p+=run;
+        }
+      }
+    }
+  }
+
+  // 3g: Remove 2-consecutive Substitute runs via cross-day swap
+  for(let cls of CLASSES){
+    for(let d=0;d<6;d++){
+      for(let p=0;p<P_DAY[d]-1;p++){
+        if(sc[d][p][cls]?.sub!=='Substitute'||sc[d][p+1][cls]?.sub!=='Substitute') continue;
+        for(let d2=0;d2<6;d2++){ if(d2===d) continue; let swap=null;
+          for(let p2=1;p2<P_DAY[d2];p2++){
+            const cell=sc[d2][p2][cls];
+            if(!cell||cell.tid==='nisha') continue;
+            if(p2>0&&sc[d2][p2-1][cls]?.tid==='nisha') continue;
+            if(p2<P_DAY[d2]-1&&sc[d2][p2+1][cls]?.tid==='nisha') continue;
+            const tId=cell.tid;
+            if(!getSubs(tId,cls).includes(cell.sub)) continue;
+            if(cell.sub===ctSub[cls]||(consumed[cls][cell.sub]||0)>=capFor(cls,cell.sub)) continue;
+            let k=-1;for(let kk=p;kk<=p+1;kk++){let ok=true;for(const c of CLASSES){if(sc[d][kk][c]?.tid===tId){ok=false;break;}}if(ok){k=kk;break;}}
+            if(k<0) continue;
+            if(sc[d][k]._free===tId) continue;
+            sc[d][k][cls]={tid:tId,sub:cell.sub};
+            sc[d2][p2][cls]={tid:'nisha',sub:'Substitute'};
+            p+=2;swap={d2,p2,tId,sub:cell.sub,oldSub:cell.sub,k};break;
+          }
+          if(swap) break;
+        }
+      }
+    }
+  }
+
+  // 3h: Ensure at most 1 Nisha per period
+  for(let d=0;d<6;d++){
+    for(let p=1;p<P_DAY[d];p++){
+      const freeId=sc[d][p]._free;
+      for(let iter=0;iter<10;iter++){
+        let nishaClasses=[];
+        for(const cls of CLASSES){if(sc[d][p][cls]?.tid==='nisha')nishaClasses.push(cls);}
+        if(nishaClasses.length<=1) break;
+        let replaced=false;
+        for(const cls of nishaClasses){
+          const usedHere2=new Set();
+          for(const cc of CLASSES){const c2=sc[d][p][cc];if(c2)usedHere2.add(c2.tid);}
+          const candidates=[];
+          for(const t of TD){if(t.id!=='nisha'&&!usedHere2.has(t.id)&&t.id!==freeId)candidates.push(t.id);}
+          for(const tId of candidates.sort((a,b)=>ld[a]-ld[b])){
+            const subs=getSubs(tId,cls);
+            if(subs.length===0) continue;
+            let foundSub=null;
+            for(const s of subs){
+              if(s===ctSub[cls]||consumed[cls][s]>=capFor(cls,s)) continue;
+              foundSub=s;break;
+            }
+            if(!foundSub) continue;
+            sc[d][p][cls]={tid:tId,sub:foundSub};
+            ld[tId]++;ld['nisha']--;
+            consumed[cls][foundSub]=(consumed[cls][foundSub]||0)+1;
+            replaced=true;break;
+          }
+          if(replaced) break;
+        }
+      if(!replaced) break;
+    }
+    // Extra Nisha -> swap to other periods
+    let remClass=[];for(const cls of CLASSES){if(sc[d][p][cls]?.tid==='nisha')remClass.push(cls);}
+    if(remClass.length>1){
+        for(const cls of CLASSES){
+          if(sc[d][p][cls]?.tid!=='nisha') continue;
+          let swapped=false;
+          for(let d2=0;d2<6&&!swapped;d2++)for(let p2=1;p2<P_DAY[d2]&&!swapped;p2++){
+            if(d2===d&&p2===p) continue;
+            let nishaUsed=false;for(const c of CLASSES){if(sc[d2][p2][c]?.tid==='nisha'){nishaUsed=true;break;}}
+            if(nishaUsed) continue;
+            if(p2>0&&sc[d2][p2-1][cls]?.tid==='nisha') continue;
+            if(p2<P_DAY[d2]-1&&sc[d2][p2+1][cls]?.tid==='nisha') continue;
+            const cell=sc[d2][p2][cls];
+            if(!cell||cell.tid==='nisha') continue;
+            const tId=cell.tid;
+            let avail=true;for(const c of CLASSES){if(sc[d][p][c]?.tid===tId){avail=false;break;}}
+            if(!avail) continue;
+            sc[d][p][cls]={tid:tId,sub:cell.sub};
+            sc[d2][p2][cls]={tid:'nisha',sub:'Substitute'};
+            swapped=true;
+          }
+        }
+      }
+    }
+  }
+
+  // 3j: Give overloaded teachers' periods to Nisha (only periods without Nisha)
+  for(let t of TD){
+    while(ld[t.id]>target[t.id]){
+      let moved=false;
+      for(let d=0;d<6&&!moved;d++)for(let p=1;p<P_DAY[d]&&!moved;p++){
+        for(const cls of CLASSES){
+          const cell=sc[d][p][cls];
+          if(!cell||cell.tid!==t.id||cell.sub==='Substitute') continue;
+          if(p>0&&sc[d][p-1][cls]?.tid==='nisha') continue;
+          if(p<P_DAY[d]-1&&sc[d][p+1][cls]?.tid==='nisha') continue;
+          let nishaThere=false;
+          for(const c2 of CLASSES){if(sc[d][p][c2]?.tid==='nisha'){nishaThere=true;break;}}
+          if(nishaThere) continue;
+          sc[d][p][cls]={tid:'nisha',sub:'Substitute'};
+          consumed[cls][cell.sub]=(consumed[cls][cell.sub]||1)-1;
+          ld[t.id]--;ld['nisha']++;
+          moved=true;break;
+        }
+        if(moved) break;
+      }
+      if(!moved) break;
+    }
+  }
+
+  // 3y: Fix multi-Nisha periods — replace extras with any available teacher
+  for(let d=0;d<6;d++){
+    for(let p=1;p<P_DAY[d];p++){
+      const nishaClasses=[];
+      for(const cls of CLASSES) if(sc[d][p][cls]?.tid==='nisha') nishaClasses.push(cls);
+      if(nishaClasses.length<=1) continue;
+      const freeId=sc[d][p]._free;
+      for(const cls of nishaClasses){
+        const usedN2=new Set();
+        for(const c2 of CLASSES){const c0=sc[d][p][c2];if(c0)usedN2.add(c0.tid);}
+        // Prefer: freeId first (doesn't increase load), then below-target, then at-target (+1 max)
+        for(const tId of [freeId,...TD.map(x=>x.id).filter(x=>x!==freeId&&!usedN2.has(x)).sort((a,b)=>ld[a]-ld[b])]){
+          if(usedN2.has(tId)) continue;
+          if(tId==='nisha'||tId===freeId&&usedN2.has(freeId)) continue;
+          if(tId!==freeId&&ld[tId]>=target[tId]+1) continue;
+          const subs=getSubs(tId,cls);
+          if(subs.length===0) continue;
+          let chosenSub=null;
+          for(const s of subs){
+            if(s===ctSub[cls]||consumed[cls][s]>=capFor(cls,s)) continue;
+            let fwd=0;for(let k=p+1;k<P_DAY[d]&&sc[d][k][cls]?.sub===s;k++)fwd++;
+            let back=1;for(let k=p-1;k>=0&&sc[d][k][cls]?.sub===s;k--)back++;
+            if(back+fwd>=4) continue;
+            chosenSub=s;break;
+          }
+          if(!chosenSub) continue;
+          sc[d][p][cls]={tid:tId,sub:chosenSub};
+          ld[tId]++;ld['nisha']--;
+          consumed[cls][chosenSub]=(consumed[cls][chosenSub]||0)+1;
+          if(tId!==freeId) rem[tId][cls][chosenSub]=Math.max(0,(rem[tId][cls][chosenSub]||0)-1);
+          usedN2.add(tId);
+          break;
+        }
+      }
+    }
+  }
+
+  // 3k: Fix consecutive Substitute pairs
+  for(let iter=0;iter<5;iter++){
+    let fixed=false;
+    for(const cls of CLASSES){
+      for(let d=0;d<6;d++){
+        for(let p=0;p<P_DAY[d]-1;p++){
+          if(sc[d][p][cls]?.sub!=='Substitute'||sc[d][p+1][cls]?.sub!=='Substitute') continue;
+          const usedHere2=new Set();
+          for(const cc of CLASSES){const c2=sc[d][p+1][cc];if(c2)usedHere2.add(c2.tid);}
+          const freeIdP2=sc[d][p+1]._free;
+          for(const t of TD){
+            if(t.id==='nisha'||t.id===freeIdP2||usedHere2.has(t.id)) continue;
+            const subs=getSubs(t.id,cls);
+            if(subs.length===0) continue;
+            let foundSub=null;
+            for(const s of subs){
+              if(s===ctSub[cls]||consumed[cls][s]>=capFor(cls,s)) continue;
+              foundSub=s;break;
+            }
+            if(!foundSub){
+              for(const s of subs){
+                if(s!==ctSub[cls]&&consumed[cls][s]<capFor(cls,s)){foundSub=s;break;}
+              }
+            }
+            if(!foundSub||foundSub===ctSub[cls]) continue;
+            sc[d][p+1][cls]={tid:t.id,sub:foundSub};
+            ld[t.id]++;ld['nisha']--;
+            consumed[cls][foundSub]=(consumed[cls][foundSub]||0)+1;
+            fixed=true;break;
+          }
+          if(fixed) break;
+        }
+        if(fixed) break;
+      }
+      if(fixed) break;
+    }
+    if(!fixed) break;
+  }
+
+  // 3m: Fill rem gaps — for each remaining rem entry, replace a Nisha slot
+  for(let iter=0;iter<20;iter++){
+    let changed=false;
+    for(const t of TD){
+      if(ld[t.id]>=target[t.id]) continue;
+      const deficit=target[t.id]-ld[t.id];
+      if(deficit<=0) continue;
+      for(const cls of CLASSES){
+        for(const sub of ALL_SUBJECTS){
+          if((rem[t.id][cls][sub]||0)<=0) continue;
+          // Find a Nisha slot in this class for any subject (or Substitute)
+          for(let d=0;d<6&&!changed;d++){
+            for(let p=1;p<P_DAY[d]&&!changed;p++){
+              const cell=sc[d][p][cls];
+              if(!cell||cell.tid!=='nisha') continue;
+              if(consumed[cls][sub]>=capFor(cls,sub)) continue;
+              let back=0;for(let k=p-1;k>=0&&sc[d][k][cls]?.sub===sub;k--)back++;
+              let fwd=0;for(let k=p+1;k<P_DAY[d]&&sc[d][k][cls]?.sub===sub;k++)fwd++;
+              if(back+1+fwd>=4) continue;
+              let busy=false;
+              for(const c of CLASSES){if(sc[d][p][c]?.tid===t.id){busy=true;break;}}
+              if(busy) continue;
+              if(sc[d][p]._free===t.id) continue;
+              sc[d][p][cls]={tid:t.id,sub};
+              ld[t.id]++;ld['nisha']--;
+              consumed[cls][sub]=(consumed[cls][sub]||0)+1;
+              rem[t.id][cls][sub]=Math.max(0,(rem[t.id][cls][sub]||0)-1);
+              changed=true;
+            }
+          }
+        }
+      }
+    }
+    if(!changed) break;
+  }
+
+  // 3n: Fix duplicate Nisha — only use teachers below target (creates no overloads)
+  for(let d=0;d<6;d++){
+    for(let p=1;p<P_DAY[d];p++){
+      let nishaClasses=[];
+      for(const cls of CLASSES){if(sc[d][p][cls]?.tid==='nisha')nishaClasses.push(cls);}
+      if(nishaClasses.length<=1) continue;
+      for(const cls of nishaClasses){
+        const usedHere2=new Set();
+        for(const cc of CLASSES){const c2=sc[d][p][cc];if(c2)usedHere2.add(c2.tid);}
+        for(const t of [...TD].sort((a,b)=>ld[a.id]-ld[b.id])){
+          if(usedHere2.has(t.id)||ld[t.id]>=target[t.id]) continue;
+          const subs=getSubs(t.id,cls);
+          if(subs.length===0) continue;
+          for(const s of subs){
+            if(s===ctSub[cls]) continue;
+            let fwd=0;for(let k=p+1;k<P_DAY[d]&&sc[d][k][cls]?.sub===s;k++)fwd++;
+            let back=1;for(let k=p-1;k>=0&&sc[d][k][cls]?.sub===s;k--)back++;
+            if(back+fwd>=4) continue;
+            sc[d][p][cls]={tid:t.id,sub:s};
+            ld[t.id]++;ld['nisha']--;
+            consumed[cls][s]=(consumed[cls][s]||0)+1;
+            usedHere2.add(t.id);
+            break;
+          }
+          if(sc[d][p][cls].tid!=='nisha') break;
+        }
+      }
+    }
+  }
+
+  // 3l: Fix stale _free
+  for(let d=0;d<6;d++){
+    sc[d][0]._free=undefined;
+    const freeToday=new Set();
+    for(let p=1;p<P_DAY[d];p++){
+      const origFree=sc[d][p]._free;
+      const busy=new Set();
+      for(const c of CLASSES){const cell=sc[d][p][c];if(cell)busy.add(cell.tid);}
+      if(origFree&&!busy.has(origFree)&&!freeToday.has(origFree)){
+        freeToday.add(origFree);
+        continue;
+      }
+      let newFree=TD.find(t=>!busy.has(t.id)&&!freeToday.has(t.id));
+      if(!newFree) newFree=TD.find(t=>!busy.has(t.id));
+      if(!newFree) continue;
+      sc[d][p]._free=newFree.id;
+      freeToday.add(newFree.id);
+    }
+  }
+
+  return sc;
+}
+
+let schedule=null;
+function initGen(){
+  schedule=genSch();
+  render();
+}
+
+// ===================== RENDER =====================
+let curView='class';
+let curClass='1A';
+let curTeacher='sangeeta';
+
+function render(){
+  if(curView==='class') renderClass();
+  else if(curView==='teacher') renderTeacher();
+  else if(curView==='summary') renderSummary();
+  else if(curView==='distrib') renderDistribution();
+  else if(curView==='overview') renderOverview();
+}
+
+function cellHTML(cell, d, p, cls){
+  let tdCls='';
+  if(!cell) return `<td><div class="cell-content"></div></td>`;
+  const {tid,sub}=cell;
+  let inner='';
+  if(tid===null){
+    inner='<span class="tstudy">Self Study</span>';
+  } else {
+    const t=ALL_T.find(x=>x.id===tid);
+    const tn=t?t.name:tid;
+    if(sub==='Substitute'){inner=`<span class="tname">${tn}</span> <span class="tsubstitute">Substitute</span>`;tdCls='sub-cell';}
+    else if(sub==='Self Study') inner=`<span class="tstudy">Self Study</span>`;
+    else inner=`<span class="tname">${tn}</span> <span class="tsub">${sub}</span>`;
+  }
+  return `<td class="${tdCls}"><div class="cell-content">${inner}</div></td>`;
+}
+
+function buildClassTable(c){
+  let h='<table><thead><tr><th>Period</th>';
+  for(let d=0;d<6;d++) h+=`<th>${DAYS[d].slice(0,3)}</th>`;
+  h+='</tr></thead><tbody>';
+  for(let p=0;p<8;p++){
+    h+=`<tr><td>${P_LABEL[p]}</td>`;
+    for(let d=0;d<6;d++){
+      if(p<P_DAY[d]) h+=cellHTML(schedule[d][p][c],d,p,c);
+      else h+=`<td><div class="cell-content">—</div></td>`;
+    }
+    h+='</tr>';
+  }
+  return h+'</tbody></table>';
+}
+
+function buildTeacherTable(tId){
+  let h='<table><thead><tr><th>Period</th>';
+  for(let d=0;d<6;d++) h+=`<th>${DAYS[d].slice(0,3)}</th>`;
+  h+='</tr></thead><tbody>';
+  for(let p=0;p<8;p++){
+    h+=`<tr><td>${P_LABEL[p]}</td>`;
+    for(let d=0;d<6;d++){
+      if(p>=P_DAY[d]){h+=`<td><div class="cell-content">—</div></td>`;continue;}
+      let found=null, foundSub=null, cellCls='';
+      for(const cls of CLASSES){
+        const cell=schedule[d][p][cls];
+        if(cell && cell.tid===tId){found=cls;foundSub=cell.sub;break;}
+      }
+      let inner='';
+      if(found&&foundSub==='Substitute'){inner=`<span class="tname">Class ${found}</span> <span class="tsubstitute">Substitute</span>`;cellCls='sub-cell';}
+      else if(found){inner=`<span class="tname">Class ${found}</span> <span class="tsub">${foundSub}</span>`;}
+      else {inner='<span class="tfree">FREE</span>';cellCls='free-cell';}
+      h+=`<td class="${cellCls}"><div class="cell-content">${inner}</div></td>`;
+    }
+    h+='</tr>';
+  }
+  return h+'</tbody></table>';
+}
+
+function renderClass(){
+  document.getElementById('overview-container').style.display='none';
+  document.getElementById('distrib-container').style.display='none';
+  const ct=document.getElementById('timetable-container');
+  ct.style.display='block';
+  document.getElementById('summary-container').style.display='none';
+  document.getElementById('app').classList.remove('teacher-view','overview-view','distrib-view','summary-view');
+
+  const c=curClass;
+  document.querySelector('.sh-class').innerHTML=`Class <strong>${c}</strong> &mdash; Weekly Schedule`;
+  ct.innerHTML=buildClassTable(c);
+}
+
+function renderTeacher(){
+  document.getElementById('overview-container').style.display='none';
+  document.getElementById('distrib-container').style.display='none';
+  const ct=document.getElementById('timetable-container');
+  ct.style.display='block';
+  document.getElementById('summary-container').style.display='none';
+  document.getElementById('app').classList.add('teacher-view');
+  document.getElementById('app').classList.remove('overview-view','distrib-view','summary-view');
+
+  const tId=curTeacher;
+  const t=ALL_T.find(x=>x.id===tId);
+  if(!t) return;
+
+  document.querySelector('.sh-class').innerHTML=`<strong>${t.name}</strong> &mdash; Weekly Schedule`;
+  ct.innerHTML=buildTeacherTable(tId);
+
+  const tp=countP(tId), fp=countF(tId);
+  const el=document.createElement('div');
+  el.style.cssText='margin-top:8px;font-size:.78rem;color:#64748b;text-align:center';
+  el.innerHTML=`Assigned: <strong>${tp}</strong> periods &middot; Free: <strong>${fp}</strong> &middot; Daily avg: <strong>${(tp/6).toFixed(1)}</strong>`;
+  ct.appendChild(el);
+}
+
+function countP(tId){let n=0;for(let d=0;d<6;d++)for(let p=0;p<P_DAY[d];p++)for(const c of CLASSES)if(schedule[d][p][c]?.tid===tId)n++;return n;}
+function countF(tId){let n=0;for(let d=0;d<6;d++)for(let p=0;p<P_DAY[d];p++){let busy=false;for(const c of CLASSES)if(schedule[d][p][c]?.tid===tId){busy=true;break;}if(!busy)n++;}return n;}
+
+function renderSummary(){
+  document.getElementById('overview-container').style.display='none';
+  document.getElementById('distrib-container').style.display='none';
+  const ct=document.getElementById('timetable-container');
+  ct.style.display='none';
+  const sc=document.getElementById('summary-container');
+  sc.style.display='block';
+  document.getElementById('app').classList.remove('teacher-view','overview-view','distrib-view');
+  document.getElementById('app').classList.add('summary-view');
+  document.querySelector('.sh-class').innerHTML='Class 1st to 10th';
+
+  let h='<h2 style="font-size:1rem;color:#0D4BBC;margin-bottom:10px">Workload Summary</h2><div class="summary-grid">';
+  for(const t of ALL_T){
+    let tot=0,fr=0;
+    for(let d=0;d<6;d++){for(let p=0;p<P_DAY[d];p++){let busy=false;for(const c of CLASSES)if(schedule[d][p][c]?.tid===t.id){busy=true;tot++;break;}if(!busy)fr++;}}
+    const ctInfo=TD.find(x=>x.ct===t.id);
+    h+=`<div class="summary-card"><h3>${t.name}</h3>
+      <div class="stat"><span>Total periods</span><span class="val">${tot}</span></div>
+      <div class="stat"><span>Free periods</span><span class="val">${fr}</span></div>
+      <div class="stat"><span>Per day</span><span class="val">${(tot/6).toFixed(1)}</span></div>
+      ${ctInfo?`<div class="stat"><span>Class teacher</span><span class="val">${ctInfo.ct}</span></div>`:''}
+      ${t.id==='nisha'?'<div class="stat" style="color:#d97706"><span>Role</span><span class="val">Substitute</span></div>':''}
+    </div>`;
+  }
+  h+='</div>';
+  sc.innerHTML=h;
+}
+
+const DISTRIB_COLORS = ['#0D4BBC','#176BE5','#3B8EF5','#6AAEF8','#0A3A8F','#082E72','#BCD4FB','#D6E4FB','#0E5FC9','#0B4FA8','#0A3D85','#082E66'];
+
+function renderDistribution(){
+  document.getElementById('overview-container').style.display='none';
+  document.getElementById('timetable-container').style.display='none';
+  document.getElementById('summary-container').style.display='none';
+  const dc=document.getElementById('distrib-container');
+  dc.style.display='block';
+  document.getElementById('app').classList.remove('teacher-view','summary-view');
+  document.getElementById('app').classList.remove('overview-view');
+  document.getElementById('app').classList.add('distrib-view');
+  document.querySelector('.sh-class').innerHTML='Class 1st to 10th';
+
+  // Compute subject distribution per class
+  const data={};
+  const allSubs=new Set();
+  for(const c of CLASSES){
+    data[c]={};
+    for(let d=0;d<6;d++)for(let p=0;p<P_DAY[d];p++){
+      const cell=schedule[d][p][c];
+      if(cell){const s=cell.sub;data[c][s]=(data[c][s]||0)+1;allSubs.add(s);}
+    }
+  }
+  const subsList=['Substitute',...[...allSubs].filter(s=>s!=='Substitute'&&s!=='Self Study').sort()];
+
+  const sh=`<div class="school-header"><div class="sh-logo"><img src="https://i.postimg.cc/JzpCchY4/RNK-Adarsh-Convent-School.png" alt="R.N.K Adarsh Convent School"><span>RNK</span></div><div class="sh-text"><div class="sh-school">R.N.K ADARSH CONVENT SCHOOL</div><div class="sh-class">Class 1st to 10th</div><div class="sh-title">Academic Time Table 2026</div></div></div>`;
+
+  let h='<h2 class="distrib-title" style="font-size:.9rem;color:#0D4BBC;margin-bottom:6px">Subject Distribution per Class</h2>';
+  for(let i=0;i<CLASSES.length;i+=6){
+    h+=`<div class="distrib-page">${sh}`;
+    h+='<h2 class="distrib-ph2" style="font-size:.9rem;color:#0D4BBC;margin-bottom:6px">Subject Distribution per Class</h2>';
+    h+='<div class="distrib-row-group">';
+    for(let j=i;j<Math.min(i+6,CLASSES.length);j++){
+      const c=CLASSES[j];
+      h+=`<div class="distrib-class"><h3>Class ${c}</h3>`;
+      let idx=0;
+      for(const s of subsList){
+        const v=data[c][s]||0;
+        if(v===0) continue;
+        const colors=DISTRIB_COLORS;
+        h+=`<div class="distrib-row">
+          <div class="distrib-label">${s}</div>
+          <div class="distrib-bar-wrap"><div class="distrib-bar" style="width:${Math.min(v/10*100,100).toFixed(0)}%;background:${colors[idx%colors.length]}">${v}</div></div>
+          <div class="distrib-count">${v}</div>
+        </div>`;
+        idx++;
+      }
+      h+='</div>';
+    }
+    h+='</div></div>';
+  }
+  dc.innerHTML=h;
+}
+
+function renderOverview(){
+  document.getElementById('timetable-container').style.display='none';
+  document.getElementById('summary-container').style.display='none';
+  document.getElementById('distrib-container').style.display='none';
+  const oc=document.getElementById('overview-container');
+  oc.style.display='block';
+  document.getElementById('app').classList.remove('teacher-view','distrib-view','summary-view');
+  document.getElementById('app').classList.add('overview-view');
+  document.querySelector('.sh-class').innerHTML='Class 1st to 10th';
+
+  const tn = {};
+  for(const t of ALL_T) tn[t.id] = t.name;
+
+  let h='';
+  const sh=`<div class="school-header"><div class="sh-logo"><img src="https://i.postimg.cc/JzpCchY4/RNK-Adarsh-Convent-School.png" alt="R.N.K Adarsh Convent School"><span>RNK</span></div><div class="sh-text"><div class="sh-school">R.N.K ADARSH CONVENT SCHOOL</div><div class="sh-class">Class 1st to 10th</div><div class="sh-title">Academic Time Table 2026</div></div></div>`;
+  for(let d=0;d<6;d++){
+    h+=`<div class="overview-day">
+      ${sh}
+      <div class="ov-day-bar">${DAYS[d]} <span>${P_DAY[d]} Periods</span></div>`;
+    h+='<table><thead><tr><th>Cls</th>';
+    for(let p=0;p<P_DAY[d];p++) h+=`<th>P${p+1}</th>`;
+    h+='</tr></thead><tbody>';
+    for(const cls of CLASSES){
+      h+=`<tr><td>${cls}</td>`;
+      for(let p=0;p<P_DAY[d];p++){
+        const cell=schedule[d][p][cls];
+        if(!cell||cell.tid==='nisha'){
+          h+=`<td class="sub-cell"><span class="ov-sub">${cell?cell.sub:'—'}</span></td>`;
+        } else {
+          const nm=tn[cell.tid]||cell.tid;
+          const sb=cell.sub;
+          h+=`<td><div class="ov-tname">${nm}</div><div class="ov-sub">${sb}</div></td>`;
+        }
+      }
+      h+='</tr>';
+    }
+    h+='</tbody></table></div>';
+  }
+  oc.innerHTML=h;
+}
+
+// ===================== CUSTOM DROPDOWN =====================
+function setupDropdown(wrapId, triggerId, textId, listId, items, getCurrent, onSelect){
+  const wrap=document.getElementById(wrapId);
+  const trigger=document.getElementById(triggerId);
+  const triggerText=document.getElementById(textId);
+  const list=document.getElementById(listId);
+
+  items.forEach(it=>{
+    const li=document.createElement('li');
+    const btn=document.createElement('button');
+    btn.className='option';
+    btn.setAttribute('role','option');
+    btn.textContent=it.label;
+    btn.dataset.value=it.value;
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+  const options=Array.from(list.querySelectorAll('.option'));
+
+  const cur=getCurrent();
+  const sel=options.find(o=>o.dataset.value===cur);
+  if(sel){triggerText.textContent=sel.textContent;triggerText.classList.remove('placeholder-dim');}
+  options.forEach(o=>o.classList.toggle('selected', o.dataset.value===cur));
+
+  function openMenu(){wrap.classList.add('open');trigger.classList.add('active');trigger.setAttribute('aria-expanded','true');}
+  function closeMenu(){wrap.classList.remove('open');trigger.classList.remove('active');trigger.setAttribute('aria-expanded','false');}
+
+  trigger.addEventListener('click',e=>{e.stopPropagation();wrap.classList.contains('open')?closeMenu():openMenu();});
+  document.addEventListener('click',()=>closeMenu());
+
+  options.forEach((opt,idx)=>{
+    opt.addEventListener('click',()=>{
+      options.forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+      triggerText.textContent=opt.textContent;
+      triggerText.classList.remove('placeholder-dim');
+      onSelect(opt.dataset.value);
+      closeMenu();
+      trigger.focus();
+    });
+    opt.addEventListener('keydown',e=>{
+      if(e.key==='ArrowDown'){e.preventDefault();(options[idx+1]||options[0]).focus();}
+      if(e.key==='ArrowUp'){e.preventDefault();(options[idx-1]||options[options.length-1]).focus();}
+      if(e.key==='Escape'){closeMenu();trigger.focus();}
+    });
+  });
+  trigger.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'||e.key==='Enter'||e.key===' '){e.preventDefault();openMenu();options[0].focus();}
+    if(e.key==='Escape'){closeMenu();}
+  });
+}
+
+// ===================== PRINT ALL =====================
+function classPageMarkup(c){
+  return `<div class="print-page"><div class="school-header">`+
+    `<div class="sh-logo">${LOGO_IMG}<span>RNK</span></div>`+
+    `<div class="sh-text"><div class="sh-school">R.N.K ADARSH CONVENT SCHOOL</div>`+
+    `<div class="sh-class">Class <strong>${c}</strong> &mdash; Weekly Schedule</div>`+
+    `<div class="sh-title">Academic Time Table 2026</div></div></div>`+
+    `<div class="table-wrap">${buildClassTable(c)}</div></div>`;
+}
+function teacherPageMarkup(tId){
+  const t=ALL_T.find(x=>x.id===tId);
+  return `<div class="print-page"><div class="school-header">`+
+    `<div class="sh-logo">${LOGO_IMG}<span>RNK</span></div>`+
+    `<div class="sh-text"><div class="sh-school">R.N.K ADARSH CONVENT SCHOOL</div>`+
+    `<div class="sh-class"><strong>${t.name}</strong> &mdash; Weekly Schedule</div>`+
+    `<div class="sh-title">Academic Time Table 2026</div></div></div>`+
+    `<div class="table-wrap">${buildTeacherTable(tId)}</div></div>`;
+}
+function doPrint(){
+  const all=document.getElementById('allprint').checked;
+  if(!all){window.print();return;}
+  const box=document.getElementById('print-all');
+  if(curView==='class') box.innerHTML=CLASSES.map(classPageMarkup).join('');
+  else if(curView==='teacher') box.innerHTML=ALL_T.map(t=>teacherPageMarkup(t.id)).join('');
+  else {window.print();return;}
+  document.body.classList.add('print-all-mode');
+  window.print();
+  document.body.classList.remove('print-all-mode');
+  box.innerHTML='';
+}
+
+document.getElementById('allprint').addEventListener('change',function(){
+  document.getElementById('legend').style.display=this.checked?'none':'flex';
+});
+
+// ===================== INIT =====================
+function init(){
+  setupDropdown('classWrap','classTrigger','classTriggerText','classDropdown',
+    CLASSES.map(c=>({value:c,label:'Class '+c})), ()=>curClass, v=>{curClass=v;render();});
+  setupDropdown('teacherWrap','teacherTrigger','teacherTriggerText','teacherDropdown',
+    ALL_T.map(t=>({value:t.id,label:t.name})), ()=>curTeacher, v=>{curTeacher=v;render();});
+
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      this.classList.add('active');
+      curView=this.dataset.view;
+      document.getElementById('class-selector').style.display=curView==='class'?'':'none';
+      document.getElementById('teacher-selector').style.display=curView==='teacher'?'':'none';
+      document.getElementById('allprint-wrap').style.display=(curView==='class'||curView==='teacher')?'':'none';
+      document.getElementById('allprint').checked=false;
+      document.getElementById('legend').style.display='flex';
+      render();
+    });
+  });
+
+  initGen();
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
+
