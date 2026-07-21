@@ -186,7 +186,7 @@ body{
   .print-only{display:block!important}
   #app{width:98%;margin:0 auto;box-shadow:none;border:2px solid #0D4BBC;box-sizing:border-box;overflow:visible;-webkit-box-decoration-break:clone;box-decoration-break:clone}
   .toolbar{display:none!important}
-  .tab,.print-btn,.regen-btn,.controls{display:none!important}
+  .tab,.print-btn,.regen-btn,.controls,.day-nav{display:none!important}
   .table-wrap{padding:4px 0.1% 0;overflow:visible}
 
 
@@ -222,6 +222,96 @@ body{
   .table-wrap table{font-size:.7rem}
   .cell-content .tname{font-size:.7rem}
   .cell-content .tsub{font-size:.7rem}
+}
+@media(min-width:701px) and (max-width:1024px){
+  .school-header{padding:14px 6px}
+  #app .school-header .sh-logo,
+  #app .school-header .sh-qr{width:75px;height:75px}
+  .school-header .sh-logo img,
+  .school-header .sh-qr img{object-fit:cover}
+  #app .school-header .sh-logo{left:6px}
+  #app .school-header .sh-qr{right:6px}
+  .school-header .sh-school{font-size:15pt}
+  .school-header .sh-class{font-size:12pt}
+  .school-header .sh-title{font-size:13pt}
+  .table-wrap{overflow-x:auto}
+  .table-wrap table{min-width:600px}
+  .table-wrap th:first-child,.table-wrap td:first-child{position:sticky;left:0;z-index:2;background:#fff}
+  .table-wrap thead th:first-child{background:#EAF1FD}
+  .controls{padding:8px 14px;gap:10px}
+  .select-wrap{width:180px}
+  .toolbar{padding:10px 14px}
+  .toolbar h1{font-size:1.15rem;min-width:100px}
+  .tab{padding:5px 12px;font-size:.75rem}
+  .day-nav{display:none}
+  .summary-grid{grid-template-columns:1fr 1fr;gap:8px}
+  #app .distrib-row-group{grid-template-columns:1fr 1fr;gap:10px}
+  .distrib-wrap{max-height:none;overflow:visible}
+  #app .overview-day{overflow:visible;padding:6px}
+  #app .overview-day .school-header{display:none}
+  #app .overview-day table{font-size:.75rem}
+  #app .overview-day th,#app .overview-day td{padding:6px 4px;font-size:.72rem}
+  #app .overview-day .ov-tname{font-size:.68rem}
+  #app .overview-day .ov-sub{font-size:.6rem}
+  #app .overview-day tbody td:first-child{width:30px;font-size:.68rem}
+}
+@media(min-width:1025px){
+  .day-nav{display:none}
+}
+@media(max-width:700px){
+  .controls{padding:6px 8px;gap:6px}
+  .select-wrap{width:120px;flex-shrink:0}
+  .select-field{gap:5px}
+  .select-label{font-size:10px}
+  .select-trigger{padding:5px 10px;font-size:.78rem}
+  .school-header{padding:10px 4px}
+  #app .school-header .sh-logo,
+  #app .school-header .sh-qr{width:56px;height:56px}
+  .school-header .sh-logo img,
+  .school-header .sh-qr img{object-fit:cover}
+  #app .school-header .sh-logo{left:4px}
+  #app .school-header .sh-qr{right:4px}
+  .school-header .sh-school{font-size:10pt}
+  .school-header .sh-class{font-size:8pt}
+  .school-header .sh-title{font-size:9pt}
+  .day-nav{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 6px;background:#f1f5f9;border-bottom:1px solid #e2e8f0}
+  .day-nav button{-webkit-appearance:none;appearance:none;background:#fff;border:2px solid #cbd5e1;border-radius:10px;padding:8px 16px;font-size:.85rem;font-weight:600;color:#0D4BBC;cursor:pointer;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+  .day-nav button:disabled{opacity:.3;cursor:default}
+  .day-nav button:active:not(:disabled){background:#E3EDFB;border-color:#0D4BBC}
+  .day-nav .dn-label{font-size:.85rem;font-weight:700;color:#1e293b;min-width:80px;text-align:center;user-select:none}
+  .table-wrap{overflow-x:auto;overflow-y:hidden}
+  .table-wrap table{min-width:auto}
+  .table-wrap th:first-child,.table-wrap td:first-child{width:44px}
+  .table-wrap tbody td:first-child{width:48px;font-size:.68rem}
+  .table-wrap,.summary-wrap,.distrib-wrap,.overview-wrap{border-radius:0}
+  #app{padding:0 0 6px;border-radius:0}
+  .toolbar{padding:6px 8px}
+  .toolbar h1{min-width:auto}
+  .btn-group{display:none}
+  .tab{padding:3px 7px;font-size:.62rem}
+  .legend{gap:5px;font-size:.6rem}
+  .summary-wrap{padding:6px 8px}
+  .summary-grid{grid-template-columns:1fr;gap:6px}
+  #app .distrib-row-group{grid-template-columns:1fr;gap:8px}
+  .cell-content{min-height:30px}
+  .cell-content .tname{font-size:.62rem}
+  .cell-content .tsub{font-size:.58rem}
+  .cell-content .tfree{font-size:.7rem}
+  .cell-content .tsubstitute{font-size:.65rem}
+  .overview-wrap{padding:4px 2px}
+  #app .overview-day{overflow:visible;padding:0;border:none;border-radius:0;margin-bottom:4px}
+  .overview-day .school-header{display:none}
+  .overview-day .ov-day-bar{font-size:.6rem;padding:3px 6px}
+  .overview-day thead{display:none}
+  .overview-day tbody tr{display:block;border:1px solid #d1d5db;border-radius:6px;margin-bottom:5px;padding:5px 6px;background:#fff}
+  #app .overview-day tbody td:first-child{display:block;font-weight:700;color:#0D4BBC;font-size:.75rem;margin-bottom:3px;text-align:left;background:transparent;border:none;padding:0}
+  .overview-day tbody td:not(:first-child){display:inline-flex;align-items:baseline;gap:2px;border:1px solid #e2e8f0;border-radius:4px;padding:2px 5px;margin:1px;white-space:nowrap;background:#f8fafc}
+  #app .overview-day .ov-tname{font-size:.58rem;display:inline}
+  .overview-day .ov-tname::after{content:"/";margin:0 1px;color:#94a3b8}
+  #app .overview-day .ov-sub{font-size:.52rem;display:inline}
+  .overview-day td.sub-cell{background:#E3EDFB!important}
+  .distrib-wrap{padding:4px 8px;max-height:none;overflow:visible}
+  .distrib-class h3{font-size:.72rem}
 }
 .distrib-wrap{padding:8px 16px;max-height:80vh;overflow-y:auto}
 @media screen{
@@ -266,7 +356,6 @@ td.sub-cell{background:#E3EDFB!important}
   #app{border-radius:20px;box-shadow:0 14px 44px rgba(13,75,188,.18);border-color:#176BE5;padding:0 10px 12px}
   .table-wrap,.summary-wrap,.distrib-wrap,.overview-wrap{border-radius:0 0 20px 20px}
   .toolbar{box-shadow:0 3px 14px rgba(13,75,188,.28);border-bottom:2px solid #0A3A8F}
-  .school-header .sh-logo{left:25px;width:110px;height:110px}
   .school-header .sh-school{text-shadow:0 1px 0 rgba(13,75,188,.08)}
   .tab:hover{box-shadow:0 2px 8px rgba(13,75,188,.25)}
   .tab.active{box-shadow:0 3px 10px rgba(13,75,188,.3);transform:translateY(-1px)}
@@ -352,6 +441,11 @@ td.sub-cell{background:#E3EDFB!important}
     </div>
   </div>
 
+  <div class="day-nav" id="dayNav">
+    <button id="dayPrev" onclick="prevDay()">←</button>
+    <span class="dn-label" id="dayLabel">Monday</span>
+    <button id="dayNext" onclick="nextDay()">→</button>
+  </div>
   <div id="timetable-container" class="table-wrap"></div>
   <div id="summary-container" class="summary-wrap" style="display:none"></div>
   <div id="distrib-container" class="distrib-wrap" style="display:none"></div>
@@ -1190,6 +1284,14 @@ function initGen(){
 let curView='class';
 let curClass='1A';
 let curTeacher='sangeeta';
+let curDay=0;
+let isMobile=false;
+const mql=window.matchMedia('(max-width:700px)');
+function updateMobile(){isMobile=mql.matches;if(!isMobile)curDay=0;}
+mql.addEventListener('change',()=>{updateMobile();render();});
+updateMobile();
+function prevDay(){if(!isMobile)return;curDay=Math.max(0,curDay-1);render();}
+function nextDay(){if(!isMobile)return;curDay=Math.min(5,curDay+1);render();}
 
 function render(){
   if(curView==='class') renderClass();
@@ -1216,13 +1318,15 @@ function cellHTML(cell, d, p, cls){
   return `<td class="${tdCls}"><div class="cell-content">${inner}</div></td>`;
 }
 
-function buildClassTable(c){
+function buildClassTable(c,forceAll){
   let h='<table><thead><tr><th>Period</th>';
-  for(let d=0;d<6;d++) h+=`<th>${DAYS[d].slice(0,3)}</th>`;
+  const mobile=isMobile&&!forceAll;
+  const dS=mobile?curDay:0, dE=mobile?curDay+1:6;
+  for(let d=dS;d<dE;d++) h+=`<th>${DAYS[d].slice(0,3)}</th>`;
   h+='</tr></thead><tbody>';
   for(let p=0;p<8;p++){
     h+=`<tr><td>${P_LABEL[p]}</td>`;
-    for(let d=0;d<6;d++){
+    for(let d=dS;d<dE;d++){
       if(p<P_DAY[d]) h+=cellHTML(schedule[d][p][c],d,p,c);
       else h+=`<td><div class="cell-content">—</div></td>`;
     }
@@ -1231,13 +1335,15 @@ function buildClassTable(c){
   return h+'</tbody></table>';
 }
 
-function buildTeacherTable(tId){
+function buildTeacherTable(tId,forceAll){
   let h='<table><thead><tr><th>Period</th>';
-  for(let d=0;d<6;d++) h+=`<th>${DAYS[d].slice(0,3)}</th>`;
+  const mobile=isMobile&&!forceAll;
+  const dS=mobile?curDay:0, dE=mobile?curDay+1:6;
+  for(let d=dS;d<dE;d++) h+=`<th>${DAYS[d].slice(0,3)}</th>`;
   h+='</tr></thead><tbody>';
   for(let p=0;p<8;p++){
     h+=`<tr><td>${P_LABEL[p]}</td>`;
-    for(let d=0;d<6;d++){
+    for(let d=dS;d<dE;d++){
       if(p>=P_DAY[d]){h+=`<td><div class="cell-content">—</div></td>`;continue;}
       let found=null, foundSub=null, cellCls='';
       for(const cls of CLASSES){
@@ -1266,6 +1372,9 @@ function renderClass(){
   const c=curClass;
   document.querySelector('.sh-class').innerHTML=`Class <strong>${c}</strong> &mdash; Weekly Schedule`;
   ct.innerHTML=buildClassTable(c);
+  const dn=document.getElementById('dayNav');
+  dn.style.display=isMobile?'flex':'none';
+  if(isMobile){document.getElementById('dayLabel').textContent=DAYS[curDay];document.getElementById('dayPrev').disabled=curDay===0;document.getElementById('dayNext').disabled=curDay>=5||curDay>=P_DAY.length-1;}
 }
 
 function renderTeacher(){
@@ -1289,6 +1398,9 @@ function renderTeacher(){
   el.style.cssText='margin-top:8px;font-size:.78rem;color:#64748b;text-align:center';
   el.innerHTML=`Assigned: <strong>${tp}</strong> periods &middot; Free: <strong>${fp}</strong> &middot; Daily avg: <strong>${(tp/6).toFixed(1)}</strong>`;
   ct.appendChild(el);
+  const dn=document.getElementById('dayNav');
+  dn.style.display=isMobile?'flex':'none';
+  if(isMobile){document.getElementById('dayLabel').textContent=DAYS[curDay];document.getElementById('dayPrev').disabled=curDay===0;document.getElementById('dayNext').disabled=curDay>=5||curDay>=P_DAY.length-1;}
 }
 
 function countP(tId){let n=0;for(let d=0;d<6;d++)for(let p=0;p<P_DAY[d];p++)for(const c of CLASSES)if(schedule[d][p][c]?.tid===tId)n++;return n;}
@@ -1299,6 +1411,7 @@ function renderSummary(){
   document.getElementById('distrib-container').style.display='none';
   const ct=document.getElementById('timetable-container');
   ct.style.display='none';
+  document.getElementById('dayNav').style.display='none';
   const sc=document.getElementById('summary-container');
   sc.style.display='block';
   document.getElementById('app').classList.remove('teacher-view','overview-view','distrib-view');
@@ -1328,6 +1441,7 @@ function renderDistribution(){
   document.getElementById('overview-container').style.display='none';
   document.getElementById('timetable-container').style.display='none';
   document.getElementById('summary-container').style.display='none';
+  document.getElementById('dayNav').style.display='none';
   const dc=document.getElementById('distrib-container');
   dc.style.display='block';
   document.getElementById('app').classList.remove('teacher-view','summary-view');
@@ -1380,6 +1494,7 @@ function renderOverview(){
   document.getElementById('timetable-container').style.display='none';
   document.getElementById('summary-container').style.display='none';
   document.getElementById('distrib-container').style.display='none';
+  document.getElementById('dayNav').style.display='none';
   const oc=document.getElementById('overview-container');
   oc.style.display='block';
   document.getElementById('app').classList.remove('teacher-view','distrib-view','summary-view');
@@ -1476,7 +1591,7 @@ function classPageMarkup(c){
     `<div class="sh-text"><div class="sh-school">R.N.K ADARSH CONVENT SCHOOL</div>`+
     `<div class="sh-class">Class <strong>${c}</strong> &mdash; Weekly Schedule</div>`+
     `<div class="sh-title">Academic Time Table 2026</div></div></div>`+
-    `<div class="table-wrap">${buildClassTable(c)}</div></div>`;
+    `<div class="table-wrap">${buildClassTable(c,true)}</div></div>`;
 }
 function teacherPageMarkup(tId){
   const t=ALL_T.find(x=>x.id===tId);
@@ -1485,7 +1600,7 @@ function teacherPageMarkup(tId){
     `<div class="sh-text"><div class="sh-school">R.N.K ADARSH CONVENT SCHOOL</div>`+
     `<div class="sh-class"><strong>${t.name}</strong> &mdash; Weekly Schedule</div>`+
     `<div class="sh-title">Academic Time Table 2026</div></div></div>`+
-    `<div class="table-wrap">${buildTeacherTable(tId)}</div></div>`;
+    `<div class="table-wrap">${buildTeacherTable(tId,true)}</div></div>`;
 }
 function doPrint(){
   const all=document.getElementById('allprint').checked;
